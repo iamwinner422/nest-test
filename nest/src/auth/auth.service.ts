@@ -7,7 +7,7 @@ export class AuthService {
     constructor(private readonly prismaService: PrismaService) {}
     async signup(signupDto: SignupDto){
         const {email, username, password} = signupDto;
-        const user = await this.prismaService.user.findUnique({
+        const user = await this.prismaService.user.findFirst({
             where: {email}
         });
         if (user) throw new ConflictException('Email already exists');
