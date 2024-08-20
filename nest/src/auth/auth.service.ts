@@ -38,7 +38,7 @@ export class AuthService {
         if (!match) throw new UnauthorizedException("Incorrect Password");
         const payload = {sub: user.userId, email: user.email};
         const token = this.JwtService.sign(payload, {
-            expiresIn: "h2", 
+            expiresIn: "2h", 
             secret: this.configService.get("SECRET_TOKEN")
         });
         return {token, user: {
