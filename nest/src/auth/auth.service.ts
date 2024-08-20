@@ -4,11 +4,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
 import { MailerService } from 'src/mailer/mailer.service';
 import { SigninDto } from './dto/signinDto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
     constructor(
         private readonly prismaService: PrismaService,
-        private readonly mailerService: MailerService
+        private readonly mailerService: MailerService,
+        private readonly JwtService: JwtService,
+        private readonly configService: ConfigService,
     ) {}
     async signup(signupDto: SignupDto){
         const {email, username, password} = signupDto;
@@ -30,7 +34,9 @@ export class AuthService {
             where: {email}
         });
         if(user) throw new NotFoundException("User not found");
-        const match = await bcrypt.compare(password, user.password)
-        if (!match) throw new UnauthorizedException("Incorrect Password")
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) throw new UnauthorizedException("Incorrect Password");
+        const payload = {sub: user.userId, email: user.email}
+        const token = this.JwtService.sign(payload, {expiresIn: "h2", secret: this.configService.get("SECRET_TOKEN")})
     }
 }
