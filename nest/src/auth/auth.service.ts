@@ -1,3 +1,4 @@
+import { ResetPasswordDemandDto } from './dto/resetPasswordDemandDto';
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signupDto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -45,5 +46,14 @@ export class AuthService {
             username: user.username,
             email: user.email,
         }}
+    }
+
+    async resetPasswordDemand(resetPasswordDemandDto: ResetPasswordDemandDto) {
+        const email = resetPasswordDemandDto.email
+        const user = await this.prismaService.user.findFirst({
+            where: {email}
+        });
+        if(!user) throw new NotFoundException("Not Found");
+
     }
 }
