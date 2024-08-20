@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignupDto } from './dto/signupDto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt'
@@ -25,6 +25,12 @@ export class AuthService {
     }
 
     async signin(signInDto: SigninDto){
-        
+        const {email, password} = signInDto;
+        const user = await this.prismaService.user.findFirst({
+            where: {email}
+        });
+        if(user) throw new NotFoundException("User not found");
+        const match = await bcrypt.compare(password, user.password)
+        if (!match) throw new UnauthorizedException("Incorrect Password")
     }
 }
