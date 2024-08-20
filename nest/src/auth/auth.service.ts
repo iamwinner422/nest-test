@@ -36,7 +36,14 @@ export class AuthService {
         if(user) throw new NotFoundException("User not found");
         const match = await bcrypt.compare(password, user.password);
         if (!match) throw new UnauthorizedException("Incorrect Password");
-        const payload = {sub: user.userId, email: user.email}
-        const token = this.JwtService.sign(payload, {expiresIn: "h2", secret: this.configService.get("SECRET_TOKEN")})
+        const payload = {sub: user.userId, email: user.email};
+        const token = this.JwtService.sign(payload, {
+            expiresIn: "h2", 
+            secret: this.configService.get("SECRET_TOKEN")
+        });
+        return {token, user: {
+            username: user.username,
+            email: user.email,
+        }}
     }
 }
