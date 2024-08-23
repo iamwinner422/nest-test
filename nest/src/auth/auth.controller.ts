@@ -35,7 +35,7 @@ export class AuthController {
     @Delete("delete")
     deleteAccount(@Req() request: Request, @Body() dto: DeleteAccountDto) {
         const userId = request.user.['userId']
-        return this.authService.deleteAccount(userId, )
+        return this.authService.deleteAccount(userId, dto)
     }
 }
 

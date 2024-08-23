@@ -94,5 +94,6 @@ export class AuthService {
         const match = await bcrypt.compare(password, user.password);
         if (!match) throw new UnauthorizedException("Incorrect Password");
         await this.prismaService.user.delete({where: {userId}})
+        return {data: "User deleted"}
     }
 }
