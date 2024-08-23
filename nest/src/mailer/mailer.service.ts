@@ -23,4 +23,16 @@ export class MailerService {
             html: "<h3>Confirmation of inscription</h3>"
         }))
     } 
+
+    async sendResetPassword(userMail: string, url: string, code: string){
+        ((await this.transporter()).sendMail({
+            from: "hello@poulou.lou",
+            to: userMail,
+            subject: "Reset password",
+            html: `
+                <a href="${url}">Reset Password</a>
+                <p>Code: ${code} (Expires in 15 Min)</p>
+            `
+        }))
+    }
 }

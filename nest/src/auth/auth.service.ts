@@ -7,6 +7,8 @@ import { MailerService } from 'src/mailer/mailer.service';
 import { SigninDto } from './dto/signinDto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import * as speakeasy from 'speakeasy';
+import e from 'express';
 @Injectable()
 export class AuthService {
     constructor(
@@ -54,6 +56,14 @@ export class AuthService {
             where: {email}
         });
         if(!user) throw new NotFoundException("Not Found");
-
+        const code = speakeasy.totp({
+            secret: this.configService.get("OTP_SECRET"),
+            digits: 5,
+            step: 60 * 15, //15 Minutes,
+            encoding: "base32"
+        });
+        const url = "http://localhost:3000/auth/reset-password-confirmation";
+        await this.mailerService.sendResetPassword(email, url, code);
+        return {data: "Mail has been sent"}
     }
 }
