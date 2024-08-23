@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import * as speakeasy from 'speakeasy';
 import e from 'express';
 import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmationDto';
+import { DeleteAccountDto } from './dto/deleteAccountDto';
 @Injectable()
 export class AuthService {
     constructor(
@@ -82,5 +83,16 @@ export class AuthService {
         const hash = await bcrypt.hash(password, 10);
         await this.prismaService.user.update({where: {userId: user.userId}, data: {password: hash}});
         return {data: "Password updated"}
+    }
+
+    async deleteAccount(userId: number, dto: DeleteAccountDto){
+        const {password} = dto
+        const user = await this.prismaService.user.findFirst({
+            where: {userId}
+        });
+        if(!user) throw new NotFoundException("Not Found");
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) throw new UnauthorizedException("Incorrect Password");
+        await this.prismaService.user.delete({where: {userId}})
     }
 }
