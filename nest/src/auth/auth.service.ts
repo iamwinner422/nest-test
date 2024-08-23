@@ -69,6 +69,18 @@ export class AuthService {
     }
 
     async resetPasswordConfirmation(resetPasswordConfirmationDto: ResetPasswordConfirmationDto){
-
+        const {email, code, password} = resetPasswordConfirmationDto
+        const user = await this.prismaService.user.findFirst({
+            where: {email}
+        });
+        if(!user) throw new NotFoundException("Not Found");
+        const match = speakeasy.totp.verify({
+            secret: this.configService.get("OTP_SECRET"),
+            token: code, digits: 5, step: 60 * 15, encoding: 'base32'
+        });
+        if(!match) throw new UnauthorizedException("Invalid OTP");
+        const hash = await bcrypt.hash(password, 10);
+        await this.prismaService.user.update({where: {userId: user.userId}, data: {password: hash}});
+        return {data: "Password updated"}
     }
 }
