@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as speakeasy from 'speakeasy';
 import e from 'express';
+import { ResetPasswordConfirmationDto } from './dto/resetPasswordConfirmationDto';
 @Injectable()
 export class AuthService {
     constructor(
@@ -65,5 +66,9 @@ export class AuthService {
         const url = "http://localhost:3000/auth/reset-password-confirmation";
         await this.mailerService.sendResetPassword(email, url, code);
         return {data: "Mail has been sent"}
+    }
+
+    async resetPasswordConfirmation(resetPasswordConfirmationDto: ResetPasswordConfirmationDto){
+
     }
 }
